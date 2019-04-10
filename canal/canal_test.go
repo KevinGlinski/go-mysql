@@ -10,7 +10,7 @@ import (
 	. "github.com/pingcap/check"
 	"github.com/pingcap/errors"
 	"github.com/siddontang/go-log/log"
-	"github.com/siddontang/go-mysql/mysql"
+	"github.com/kevinglinski/go-mysql/mysql"
 )
 
 var testHost = flag.String("host", "127.0.0.1", "MySQL host")

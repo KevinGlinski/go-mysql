@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	. "github.com/siddontang/go-mysql/mysql"
+	. "github.com/kevinglinski/go-mysql/mysql"
 	"github.com/siddontang/go/hack"
 )
 
@@ -13,7 +13,7 @@ type Handler interface {
 	UseDB(dbName string) error
 	//handle COM_QUERY command, like SELECT, INSERT, UPDATE, etc...
 	//If Result has a Resultset (SELECT, SHOW, etc...), we will send this as the response, otherwise, we will send Result
-	HandleQuery(query string) (*Result, error)
+	HandleQuery(user, query string) (*Result, error)
 	//handle COM_FILED_LIST command
 	HandleFieldList(table string, fieldWildcard string) ([]*Field, error)
 	//handle COM_STMT_PREPARE, params is the param number for this statement, columns is the column number
@@ -67,7 +67,7 @@ func (c *Conn) dispatch(data []byte) interface{} {
 		c.Conn = nil
 		return noResponse{}
 	case COM_QUERY:
-		if r, err := c.h.HandleQuery(hack.String(data)); err != nil {
+		if r, err := c.h.HandleQuery(c.user, hack.String(data)); err != nil {
 			return err
 		} else {
 			return r
