@@ -3,6 +3,7 @@ package mysql
 import (
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/pingcap/errors"
 	"github.com/siddontang/go/hack"
@@ -38,11 +39,27 @@ func formatTextValue(value interface{}) ([]byte, error) {
 		return v, nil
 	case string:
 		return hack.Slice(v), nil
+	case time.Time:
+		return convTime(v)
 	case nil:
 		return nil, nil
 	default:
 		return nil, errors.Errorf("invalid type %T", value)
 	}
+}
+
+func convTime(t time.Time) ([]byte, error){
+	// 2010-10-17 19:27:30.000 001
+	t = time.Date(2010,10,17,19,27,30,1, time.UTC)
+	rtn := []byte{11}
+
+	if t.IsZero() {
+		rtn = append(rtn, "0000-00-00 00:00:00.000000"...)
+	} else {
+		rtn = t.AppendFormat(rtn, "2006-01-02 15:04:05.999999")
+	}
+
+	return rtn, nil
 }
 
 func formatBinaryValue(value interface{}) ([]byte, error) {
@@ -92,6 +109,8 @@ func fieldType(value interface{}) (typ uint8, err error) {
 		typ = MYSQL_TYPE_VAR_STRING
 	case nil:
 		typ = MYSQL_TYPE_NULL
+	case time.Time:
+		typ = MYSQL_TYPE_DATETIME
 	default:
 		err = errors.Errorf("unsupport type %T for resultset", value)
 	}
@@ -111,8 +130,12 @@ func formatField(field *Field, value interface{}) error {
 		field.Flag = BINARY_FLAG | NOT_NULL_FLAG
 	case string, []byte:
 		field.Charset = 33
+	case time.Time:
+		field.Charset = 63
+		field.Flag = BINARY_FLAG | NOT_NULL_FLAG
 	case nil:
 		field.Charset = 33
+
 	default:
 		return errors.Errorf("unsupport type %T for resultset", value)
 	}
