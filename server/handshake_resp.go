@@ -118,7 +118,15 @@ func (c *Conn) readDb(data []byte, pos int) (int, error) {
 
 func (c *Conn) readPluginName(data []byte, pos int) int {
 	if c.capability&CLIENT_PLUGIN_AUTH != 0 {
-		c.authPluginName = string(data[pos : pos+bytes.IndexByte(data[pos:], 0x00)])
+		//fix for index out of range error
+		endIndex := pos+bytes.IndexByte(data[pos:], 0x00)
+
+		if endIndex == -1 || endIndex > len(data) - 1 {
+			c.authPluginName = AUTH_NATIVE_PASSWORD
+			return pos
+		}
+
+		c.authPluginName = string(data[pos : endIndex])
 		pos += len(c.authPluginName)
 	} else {
 		// The method used is Native Authentication if both CLIENT_PROTOCOL_41 and CLIENT_SECURE_CONNECTION are set,
