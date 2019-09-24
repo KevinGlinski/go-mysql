@@ -32,7 +32,7 @@ type Handler interface {
 
 func (c *Conn) HandleCommand() error {
 	if c.Conn == nil {
-		return fmt.Errorf("connection closed")
+		return nil
 	}
 
 	data, err := c.ReadPacket()
