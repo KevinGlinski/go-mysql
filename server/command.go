@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	. "github.com/kevinglinski/go-mysql/mysql"
@@ -32,7 +33,7 @@ type Handler interface {
 
 func (c *Conn) HandleCommand() error {
 	if c.Conn == nil {
-		return nil
+		return errors.New("connection closed")
 	}
 
 	data, err := c.ReadPacket()
