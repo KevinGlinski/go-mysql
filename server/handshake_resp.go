@@ -153,6 +153,10 @@ func (c *Conn) readAuthData(data []byte, pos int) ([]byte, int, int, error) {
 		authLen = readBytes
 	} else {
 		//auth length and auth
+		if len(data) <= pos {
+			return nil, 0, 0, NewDefaultError(ER_ACCESS_DENIED_ERROR, c.LocalAddr().String(), c.user, "Yes")
+		}
+
 		authLen = int(data[pos])
 		pos++
 		auth = data[pos : pos+authLen]
