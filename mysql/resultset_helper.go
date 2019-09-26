@@ -51,7 +51,8 @@ func formatTextValue(value interface{}) ([]byte, error) {
 func convTime(t time.Time) ([]byte, error){
 	// 2010-10-17 19:27:30.000 001
 	//t = time.Date(2010,10,17,19,27,30,1, time.UTC)
-	rtn := []byte{11}
+	//rtn := []byte{11}
+	rtn := []byte{}
 
 	if t.IsZero() {
 		rtn = append(rtn, "0000-00-00 00:00:00.000000"...)
