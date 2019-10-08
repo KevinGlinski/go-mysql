@@ -68,11 +68,11 @@ func (c *Conn) ReadPacketTo(w io.Writer) error {
 	c.Sequence++
 
 	if n, err := io.CopyN(w, c.Conn, int64(length)); err != nil {
-		return errors.New("bad connection - 1 -" + err.Error())
-		//return ErrBadConn
+		//return errors.Errorf("bad connection - 1 - %v" , err.Error())
+		return ErrBadConn
 	} else if n != int64(length) {
-		return errors.New(fmt.Sprintf("bad connection - 2 - %v, %v", n, length))
-		//return ErrBadConn
+		//return errors.Errorf("bad connection - 2 - %v, %v", n, length)
+		return ErrBadConn
 	} else {
 		if length < MaxPayloadLen {
 			return nil
@@ -99,11 +99,11 @@ func (c *Conn) WritePacket(data []byte) error {
 		data[3] = c.Sequence
 
 		if n, err := c.Write(data[:4+MaxPayloadLen]); err != nil {
-			return errors.New("error writing packet - 1 -" + err.Error())
-			//return ErrBadConn
+			//return errors.Errorf("error writing packet - 1 - %v" , err.Error())
+			return ErrBadConn
 		} else if n != (4 + MaxPayloadLen) {
-			return errors.New(fmt.Sprintf("bad connection - 2 - %v", n))
-			//return ErrBadConn
+			//return errors.Errorf("bad connection - 2 - %v", n)
+			return ErrBadConn
 		} else {
 			c.Sequence++
 			length -= MaxPayloadLen
@@ -117,11 +117,11 @@ func (c *Conn) WritePacket(data []byte) error {
 	data[3] = c.Sequence
 
 	if n, err := c.Write(data); err != nil {
-		return errors.New("error writing packet - 3 -" + err.Error())
-		//return ErrBadConn
+		//return errors.Errorf("error writing packet - 3 - %v" , err.Error())
+		return ErrBadConn
 	} else if n != len(data) {
-		return errors.New(fmt.Sprintf("bad connection - 4 - %v", n))
-		//return ErrBadConn
+		//return errors.Errorf("bad connection - 4 - %v", n)
+		return ErrBadConn
 	} else {
 		c.Sequence++
 		return nil
