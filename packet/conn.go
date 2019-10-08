@@ -2,7 +2,7 @@ package packet
 
 import (
 	"bytes"
-	"fmt"
+
 	"io"
 	"net"
 
