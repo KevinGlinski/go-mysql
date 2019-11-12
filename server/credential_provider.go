@@ -1,6 +1,9 @@
 package server
 
-import "sync"
+import (
+	"net"
+	"sync"
+)
 
 // interface for user credential provider
 // hint: can be extended for more functionality
@@ -9,9 +12,9 @@ import "sync"
 // for 'caching_sha2_password' by calling 'func (s *Server)InvalidateCache(string, string)'.
 type CredentialProvider interface {
 	// check if the user exists
-	CheckUsername(username string) (bool, error)
+	CheckUsername(username string, remoteAddress net.Addr) (bool, error)
 	// get user credential
-	GetCredential(username string) (password string, found bool, err error)
+	GetCredential(username string, remoteAddress net.Addr) (password string, found bool, err error)
 }
 
 func NewInMemoryProvider() *InMemoryProvider {
@@ -25,12 +28,12 @@ type InMemoryProvider struct {
 	userPool sync.Map // username -> password
 }
 
-func (m *InMemoryProvider) CheckUsername(username string) (found bool, err error) {
+func (m *InMemoryProvider) CheckUsername(username string, _ net.Addr) (found bool, err error) {
 	_, ok := m.userPool.Load(username)
 	return ok, nil
 }
 
-func (m *InMemoryProvider) GetCredential(username string) (password string, found bool, err error) {
+func (m *InMemoryProvider) GetCredential(username string, _ net.Addr) (password string, found bool, err error) {
 	v, ok := m.userPool.Load(username)
 	if !ok {
 		return "", false, nil

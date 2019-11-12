@@ -51,7 +51,7 @@ func (c *Conn) compareAuthData(authPluginName string, clientAuthData []byte) err
 }
 
 func (c *Conn) acquirePassword() error {
-	password, found, err := c.credentialProvider.GetCredential(c.user)
+	password, found, err := c.credentialProvider.GetCredential(c.user, c.Conn.RemoteAddr())
 	if err != nil {
 		return err
 	}

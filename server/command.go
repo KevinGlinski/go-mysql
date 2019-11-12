@@ -40,7 +40,7 @@ func (c *Conn) HandleCommand() error {
 	if err != nil {
 		c.Close()
 		c.Conn = nil
-		return err
+		return errors.New(fmt.Sprintf("Error reading packet %v", err))
 	}
 
 	v := c.dispatch(data)
@@ -52,6 +52,8 @@ func (c *Conn) HandleCommand() error {
 	}
 
 	if err != nil {
+		errors.New(fmt.Sprintf("Error writeValue (%v) %v", data, err))
+
 		c.Close()
 		c.Conn = nil
 	}
